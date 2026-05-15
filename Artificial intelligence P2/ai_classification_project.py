@@ -2,28 +2,36 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 
+iris_data = pd.read_excel('iris_dataset.xlsx')
 
-iris = load_iris()
+print("========= DATASET LOADED SUCCESSFULLY =========")
 
-X = pd.DataFrame(iris.data, columns=iris.feature_names)
-y = iris.target
+print("========= FIRST 5 ROWS =========")
+print(iris_data.head())
 
+print("========= DATASET INFORMATION =========")
+print(iris_data.info())
 
-print("\n========= DATASET INFORMATION =========")
-print(X.head())
+print("========= DATASET SHAPE =========")
+print(iris_data.shape)
 
-print("\n========= TARGET LABELS =========")
-print(iris.target_names)
+print("========= UNIQUE CLASSES =========")
+print(iris_data['species'].unique())
 
-print("\n========= DATASET SHAPE =========")
-print(X.shape)
+X = iris_data[[
+    'sepal_length',
+    'sepal_width',
+    'petal_length',
+    'petal_width'
+]]
+
+y = iris_data['species']
 
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -33,44 +41,43 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-print("\nTraining Data Size:", len(X_train))
+print("Training Data Size:", len(X_train))
 print("Testing Data Size:", len(X_test))
-
 
 model = LogisticRegression(max_iter=200)
 
 model.fit(X_train, y_train)
 
-print("\nModel Training Completed Successfully!")
+print("Model Training Completed Successfully!")
 
 
 predictions = model.predict(X_test)
 
-print("\n========= PREDICTIONS =========")
+print("========= PREDICTIONS =========")
 print(predictions)
 
 
 accuracy = accuracy_score(y_test, predictions)
 
-print("\n========= MODEL ACCURACY =========")
+print("========= MODEL ACCURACY =========")
 print(f"Accuracy: {accuracy * 100:.2f}%")
-
-
-print("\n========= CLASSIFICATION REPORT =========")
+print("========= CLASSIFICATION REPORT =========")
 print(classification_report(y_test, predictions))
 
 
 cm = confusion_matrix(y_test, predictions)
 
-print("\n========= CONFUSION MATRIX =========")
+print("========= CONFUSION MATRIX =========")
 print(cm)
 
 plt.figure(figsize=(8, 5))
 
+species_codes = pd.factorize(y)[0]
+
 plt.scatter(
-    X['sepal length (cm)'],
-    X['petal length (cm)'],
-    c=y,
+    iris_data['sepal_length'],
+    iris_data['petal_length'],
+     c=species_codes
 )
 
 plt.xlabel('Sepal Length')
@@ -84,6 +91,5 @@ sample_data = [[5.1, 3.5, 1.4, 0.2]]
 
 prediction = model.predict(sample_data)
 
-print("\n========= CUSTOM PREDICTION =========")
-print("Predicted Flower:", iris.target_names[prediction][0])
-
+print("========= CUSTOM PREDICTION =========")
+print("Predicted Flower:", prediction[0])
